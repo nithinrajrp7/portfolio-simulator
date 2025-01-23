@@ -64,7 +64,7 @@ if st.session_state.show_instructions:
 st.title("Portfolio Simulator")  # Changed title
 
 # Import company and tickers
-data = pd.read_csv("C:/Users/shali/Downloads/EQUITY_L.csv")
+data = pd.read_csv("EQUITY_L.csv")
 Company = data["NAME OF COMPANY"].tolist()
 Symbol = data["SYMBOL"].tolist()
 Company_to_symbol = dict(zip(Company, Symbol))
