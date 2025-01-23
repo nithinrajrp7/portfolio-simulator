@@ -13,14 +13,58 @@ from plotly.subplots import make_subplots
 from scipy.optimize import minimize
 import streamlit as st
 
-#importing symbols
-data=pd.read_csv("EQUITY_L.csv")
+# Custom CSS for button
+st.markdown(
+    """
+    <style>
+    .top-right-button {
+        position: relative;
+        float: right;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin: 4px 2px;
+        cursor: pointer;
+        border-radius: 4px;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
+# Initialize session state
+if 'show_instructions' not in st.session_state:
+    st.session_state.show_instructions = False
+
+# Add the "How to Use the App" button
+if st.button("Know About the App"):
+    st.session_state.show_instructions = not st.session_state.show_instructions
+
+# Toggle instructions visibility
+if st.session_state.show_instructions:
+    with st.expander("Know About the App", expanded=True):
+        st.write("""
+        ***This app is for learning purposes only and does not provide investment recommendations or guarantee any returns.**
+        
+        1. **Security Coverage:** The app is designed to use securities listed on the Indian stock exchange (NSE).
+        2. **Stock Returns:** The app uses monthly stock returns to create the efficient frontier and ideal portfolio weights.
+        3. **Risk-Free Rate:** The 10-year Government bond yield will be adjusted to a monthly return to identify the portfolio with the maximum Sharpe ratio.
+        4. **Show Portfolio Rebalancer:** This section allows to see the ideal allocation, current allocation, and rebalancing required based on the selected stocks and the investment amount.
+        """)
+
+# Additional content here
+
 
 # Set the app title
 st.title("Portfolio Simulator")  # Changed title
 
 # Import company and tickers
-data = pd.read_csv("EQUITY_L.csv")
+data = pd.read_csv("C:/Users/shali/Downloads/EQUITY_L.csv")
 Company = data["NAME OF COMPANY"].tolist()
 Symbol = data["SYMBOL"].tolist()
 Company_to_symbol = dict(zip(Company, Symbol))
@@ -54,7 +98,7 @@ if selected_option and start_date < end_date:
             volatility = np.sqrt(np.dot(weights.T, np.dot(cov_matrix, weights)))
             return returns * 100, volatility * 100  # Convert to %
 
-        def get_efficient_frontier(mean_returns, cov_matrix, risk_free_rate):
+        def get_efficient_frontier(mean_returns, cov_matrix, monthly_risk_free_rate):
             num_assets = len(mean_returns)
             constraints = ({'type': 'eq', 'fun': lambda x: np.sum(x) - 1})
             bounds = tuple((-1, 2) for asset in range(num_assets))
@@ -75,8 +119,8 @@ if selected_option and start_date < end_date:
 
             return efficient_portfolios
 
-        def calculate_efficient_frontier(mean_returns, cov_matrix, risk_free_rate):
-            efficient_portfolios = get_efficient_frontier(mean_returns, cov_matrix, risk_free_rate)
+        def calculate_efficient_frontier(mean_returns, cov_matrix, monthly_risk_free_rate):
+            efficient_portfolios = get_efficient_frontier(mean_returns, cov_matrix, monthly_risk_free_rate)
             returns = []
             volatilities = []
 
@@ -87,22 +131,20 @@ if selected_option and start_date < end_date:
 
             return np.array(returns), np.array(volatilities), efficient_portfolios
 
-        def plot_efficient_frontier(mean_returns, cov_matrix, risk_free_rate):
-            returns, volatilities, efficient_portfolios = calculate_efficient_frontier(mean_returns, cov_matrix, risk_free_rate)
-            sharpe_ratios = (returns - risk_free_rate * 100) / volatilities  # Convert risk-free rate to %
+        def plot_efficient_frontier(mean_returns, cov_matrix, monthly_risk_free_rate):
+            returns, volatilities, efficient_portfolios = calculate_efficient_frontier(mean_returns, cov_matrix, monthly_risk_free_rate)
+            sharpe_ratios = (returns - monthly_risk_free_rate * 100) / volatilities  # Convert risk-free rate to %
 
-            fig = make_subplots(rows=1, cols=2, subplot_titles=("Ideal Weight Allocation", "Efficient Frontier"))
+            fig = make_subplots(rows=1, cols=2, subplot_titles=("Ideal Weight Allocation", "Minimum Variance Frontier"))
 
-            # Vertical Bar Chart for Portfolio Weights
             weights = efficient_portfolios[np.argmax(sharpe_ratios)]
-            
+
             bar_fig = go.Bar(x=selected_option, y=weights, text=[f'{weight:.2%}' for weight in weights], textposition='outside', showlegend=False)
             fig.add_trace(bar_fig, row=1, col=1)
 
             fig.update_yaxes(range=[min(weights) - 0.1, max(weights) + 0.1], row=1, col=1)
             fig.update_layout(yaxis=dict(title_text='Weights %'))
 
-            # Efficient Frontier Plot
             fig.add_trace(go.Scatter(
                 x=volatilities,
                 y=returns,
@@ -151,6 +193,7 @@ else:
         st.write("Select stock in your Portfolio to Start the Analysis")
     if start_date >= end_date:
         st.write("End date must be after start date")
+
 
 show_rebalancer = st.sidebar.checkbox('Show Portfolio Rebalancer')
 
