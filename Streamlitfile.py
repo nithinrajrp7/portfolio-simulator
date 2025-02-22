@@ -49,18 +49,17 @@ if st.button("Know About the App"):
 if st.session_state.show_instructions:
     with st.expander("Know About the App", expanded=True):
         st.write("""
-        This app helps you optimize your investment portfolio by analyzing the monthly returns of selected stocks and determining their ideal allocation for maximum Sharpe ratio. 
-        It allows you to create the best portfolio, discover optimal investment percentages for each stock.
-        Use the “Show Portfolio Rebalancer” feature to compare current investments with ideal allocations and identify necessary adjustments.
-        ****Key Features****
-        1. **Security Coverage:** The app is designed to use securities listed on the Indian stock exchange (NSE).
-        2. **Stock Returns:** The app uses monthly stock returns to create the efficient frontier and ideal portfolio weights.
-        3. **Risk-Free Rate:** The 10-year Government bond yield will be adjusted to a monthly return to identify the portfolio with the maximum Sharpe ratio.
-
-        ***This app is for learning purposes only and does not provide investment recommendations or guarantee any returns.**
+        This app helps you understand portfolio construction by:
+        1. Building **efficient frontiers** to visualize risk-return tradeoffs
+        2. Identifying portfolios with the **highest Sharpe ratio**
+        3. Showing ideal stock allocations for maximum risk-adjusted returns
+        4. Comparing current vs. ideal allocations with **Portfolio Rebalancer**
         """)
-
-# Additional content here
+        
+        st.caption("""
+        *Uses monthly stock returns. 10-year government bond yield is adjusted to monthly risk-free rate.  
+        Results are illustrative - not investment advice.
+        """)
 
 
 # Set the app title
