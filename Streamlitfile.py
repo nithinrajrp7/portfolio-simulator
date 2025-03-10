@@ -220,7 +220,7 @@ if show_rebalancer:
             'Rebalancing Required': [weights[stock] - amounts_percent[idx] for idx, stock in enumerate(stocks)]
         })
 
-        df_melted = df.melt(id_vars=['Stock'], value_vars=['Percentage of Total Investment', 'Weight', 'Rebalancing Required'], 
+        df_melted = df.melt(id_vars=['Stock'], value_vars=['Current Allocation (%)', 'Target Allocation (%)', 'Rebalancing Needed (%)'], 
                             var_name='Metric', value_name='Value')
 
         fig1 = px.bar(df_melted, x='Stock', y='Value', color='Metric', barmode='group', 
