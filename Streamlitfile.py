@@ -49,7 +49,7 @@ if st.button("Know About the App"):
 if st.session_state.show_instructions:
     with st.expander("Know About the App", expanded=True):
         st.write("""
-        This app helps you understand portfolio construction by:
+        This app helps you understand portfolio construction using stocks listed on **NSE India**:
         1. Building **efficient frontiers** to visualize risk-return tradeoffs
         2. Identifying portfolios with the **highest Sharpe ratio**
         3. Showing ideal stock allocations for maximum risk-adjusted returns
@@ -224,13 +224,13 @@ if show_rebalancer:
                             var_name='Metric', value_name='Value')
 
         fig1 = px.bar(df_melted, x='Stock', y='Value', color='Metric', barmode='group', 
-                      text=df_melted['Value'].map('{:.2f}%'.format),  # Display values as percentages with 2 decimal places
+                      text=df_melted['Value'].map('{:.2f}%'.format),  
                       color_discrete_map={
-                          'Rebalancing Required': 'darkblue',
-                          'Percentage of Total Investment': 'lightblue',
-                          'Weight': 'lightgreen'
+                          'Rebalancing Needed (%)': 'darkblue',
+                          'Current Allocation (%)': 'lightblue',
+                          'Target Allocation (%)': 'lightgreen'
                       },
-                      labels={'Value': 'Values', 'Stock': 'Stocks'}, title='Investment Amounts and Weights')
+                      labels={'Value': 'Values', 'Stock': 'Stocks'}, title='Portfolio Weights: Actual vs. Recommended')
 
         fig1.update_traces(textposition='outside')  # Show text outside the bar
         st.plotly_chart(fig1)
