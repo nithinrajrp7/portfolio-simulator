@@ -49,7 +49,7 @@ if st.button("Know About the App"):
 if st.session_state.show_instructions:
     with st.expander("Know About the App", expanded=True):
         st.write("""
-        This app helps you understand portfolio construction using stocks listed on **NSE India**:
+        This app helps you understand portfolio construction using stocks listed on **NSE India** by:
         1. Building **efficient frontiers** to visualize risk-return tradeoffs
         2. Identifying portfolios with the **highest Sharpe ratio**
         3. Showing ideal stock allocations for maximum risk-adjusted returns
