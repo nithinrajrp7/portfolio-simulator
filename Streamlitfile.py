@@ -156,7 +156,7 @@ if selected_option and start_date < end_date:
                     size=10
                 ),
                 text=[f'Sharpe Ratio: {sr:.2f}' for sr in sharpe_ratios],
-                name='Efficient Frontier'
+                showlegend=False
             ), row=1, col=2)
 
             max_sharpe_idx = np.argmax(sharpe_ratios)
