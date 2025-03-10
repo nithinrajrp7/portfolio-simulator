@@ -200,40 +200,50 @@ else:
 show_rebalancer = st.sidebar.checkbox('Show Portfolio Rebalancer')
 
 if show_rebalancer:
-    Investment_Amount = {}
-    for stock in selected_option:
-        amount = st.sidebar.number_input(f'Enter the amount invested in {stock}', min_value=0, value=0)
-        Investment_Amount[stock] = amount
-
-    if any(Investment_Amount.values()):
-        stocks = list(Investment_Amount.keys())
-        amounts = list(Investment_Amount.values())
-        total_amount = sum(amounts)
-        amounts_percent = [(amount / total_amount) * 100 for amount in amounts]
-
-        weights = {stock: optimal_portfolio_weights[idx] * 100 for idx, stock in enumerate(selected_option)}
-
-        df = pd.DataFrame({
-            'Stock': stocks,
-            'Percentage of Total Investment': amounts_percent,
-            'Weight': [weights[stock] for stock in stocks],
-            'Rebalancing Required': [weights[stock] - amounts_percent[idx] for idx, stock in enumerate(stocks)]
-        })
-
-        df_melted = df.melt(id_vars=['Stock'], value_vars=['Current Allocation (%)', 'Target Allocation (%)', 'Rebalancing Needed (%)'], 
-                            var_name='Metric', value_name='Value')
-
-        fig1 = px.bar(df_melted, x='Stock', y='Value', color='Metric', barmode='group', 
-                      text=df_melted['Value'].map('{:.2f}%'.format),  
-                      color_discrete_map={
-                          'Rebalancing Needed (%)': 'darkblue',
-                          'Current Allocation (%)': 'lightblue',
-                          'Target Allocation (%)': 'lightgreen'
-                      },
-                      labels={'Value': 'Values', 'Stock': 'Stocks'}, title='Portfolio Weights: Actual vs. Recommended')
-
-        fig1.update_traces(textposition='outside')  # Show text outside the bar
-        st.plotly_chart(fig1)
+    # Check if optimal_portfolio_weights is defined
+    if 'optimal_portfolio_weights' not in globals():
+        st.warning("Please select stocks and dates first to calculate optimal weights.")
     else:
-        st.write("Please enter the investment amounts to view the chart.")
+        Investment_Amount = {}
+        for stock in selected_option:
+            amount = st.sidebar.number_input(f'Enter the amount invested in {stock}', min_value=0, value=0)
+            Investment_Amount[stock] = amount
+
+        if any(Investment_Amount.values()):
+            stocks = list(Investment_Amount.keys())
+            amounts = list(Investment_Amount.values())
+            total_amount = sum(amounts)
+            amounts_percent = [(amount / total_amount) * 100 for amount in amounts]
+
+            # Map optimal weights to stocks
+            weights = {stock: optimal_portfolio_weights[idx] * 100 for idx, stock in enumerate(selected_option)}
+
+            # Create DataFrame
+            df = pd.DataFrame({
+                'Stock': stocks,
+                'Current Allocation (%)': amounts_percent,
+                'Target Allocation (%)': [weights[stock] for stock in stocks],
+                'Rebalancing Needed (%)': [weights[stock] - amounts_percent[idx] for idx, stock in enumerate(stocks)]
+            })
+
+            # Melt DataFrame for Plotly
+            df_melted = df.melt(id_vars=['Stock'], 
+                                value_vars=['Current Allocation (%)', 'Target Allocation (%)', 'Rebalancing Needed (%)'], 
+                                var_name='Metric', value_name='Value')
+
+            # Create bar chart
+            fig1 = px.bar(df_melted, x='Stock', y='Value', color='Metric', barmode='group', 
+                          text=df_melted['Value'].map('{:.2f}%'.format),  
+                          color_discrete_map={
+                              'Rebalancing Needed (%)': 'darkblue',
+                              'Current Allocation (%)': 'lightblue',
+                              'Target Allocation (%)': 'lightgreen'
+                          },
+                          labels={'Value': 'Values', 'Stock': 'Stocks'}, 
+                          title='Portfolio Weights: Actual vs. Recommended')
+
+            fig1.update_traces(textposition='outside')  # Show text outside the bar
+            st.plotly_chart(fig1)
+        else:
+            st.write("Please enter the investment amounts to view the chart.")
 
